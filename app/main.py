@@ -1,14 +1,20 @@
 from kivy.app import App
-from kivy.uix.label import Label
+from kivy.uix.screenmanager import ScreenManager
+
+from app.screens.home import HomeScreen
 
 
 class GoldenStudio(App):
 
     def build(self):
-        return Label(
-            text="Golden Studio",
-            font_size=30
+
+        manager = ScreenManager()
+
+        manager.add_widget(
+            HomeScreen(name="home")
         )
+
+        return manager
 
 
 GoldenStudio().run()
