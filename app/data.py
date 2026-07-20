@@ -1,8 +1,10 @@
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.label import MDLabel
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.button import MDRaisedButton
+
+from engine.validator import Validator
+from engine.runner import PythonRunner
 
 
 class DataScreen(MDScreen):
@@ -10,79 +12,74 @@ class DataScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.fields = {}
+        self.validator = Validator()
+        self.runner = PythonRunner()
 
-        root = MDBoxLayout(
+        self.function = None
+        self.code = ""
+
+        self.layout = MDBoxLayout(
             orientation="vertical",
             padding=15,
-            spacing=15
-        )
-
-        title = MDLabel(
-            text="ورود اطلاعات",
-            halign="center",
-            font_style="Headline"
-        )
-
-        root.add_widget(title)
-
-        self.form_layout = MDBoxLayout(
-            orientation="vertical",
-            adaptive_height=True,
             spacing=10
         )
 
-        root.add_widget(self.form_layout)
+        self.fields = {}
 
-        self.calculate_button = MDRaisedButton(
-            text="محاسبه",
-            pos_hint={"center_x": 0.5}
+        self.button = MDRaisedButton(
+            text="اجرای تابع"
         )
 
-        self.calculate_button.bind(
-            on_release=self.calculate
-        )
+        self.button.bind(on_release=self.run_function)
 
-        root.add_widget(self.calculate_button)
+        self.add_widget(self.layout)
 
-        self.add_widget(root)
+    def load_form(self, form, code=""):
 
-    def build_form(self, form):
+        self.layout.clear_widgets()
 
-        self.form_layout.clear_widgets()
+        self.fields = {}
 
-        self.fields.clear()
+        self.function = form
+
+        self.code = code
 
         for field in form["fields"]:
 
-            widget = MDTextField(
+            text = MDTextField(
                 hint_text=field["label"]
             )
 
-            self.fields[field["label"]] = widget
+            self.fields[field["label"]] = (
+                text,
+                field["type"]
+            )
 
-            self.form_layout.add_widget(widget)
+            self.layout.add_widget(text)
 
-    def get_values(self):
+        self.layout.add_widget(self.button)
+
+    def run_function(self, instance):
 
         values = {}
 
-        for name, widget in self.fields.items():
+        for name, item in self.fields.items():
 
-            values[name] = widget.text
+            widget, value_type = item
 
-        return values
+            values[name] = self.validator.validate(
+                widget.text,
+                value_type
+            )
 
-    def calculate(self, *args):
+        result = self.runner.execute(
+            self.code,
+            self.function["title"],
+            values
+        )
 
-        values = self.get_values()
+        result_screen = self.manager.get_screen("result")
 
-        print("Values :", values)
+        result_screen.show_result(result)
 
-        if self.manager:
-
-            result_screen = self.manager.get_screen("result")
-
-            result_screen.show_result(values)
-
-            self.manager.current = "result"
+        self.manager.current = "result"
