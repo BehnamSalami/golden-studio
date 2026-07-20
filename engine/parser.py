@@ -31,17 +31,32 @@ class FunctionParser:
 
                 for arg in node.args.args:
 
-                    function["parameters"].append(
+    parameter_type = "text"
 
-                        {
+    if arg.annotation:
 
-                            "name": arg.arg,
+        if isinstance(arg.annotation, ast.Name):
 
-                            "type": "text"
+            annotation = arg.annotation.id
 
-                        }
+            if annotation == "int":
+                parameter_type = "integer"
 
-                    )
+            elif annotation == "float":
+                parameter_type = "float"
+
+            elif annotation == "str":
+                parameter_type = "text"
+
+            elif annotation == "bool":
+                parameter_type = "boolean"
+
+    function["parameters"].append(
+        {
+            "name": arg.arg,
+            "type": parameter_type
+        }
+    )
 
                 functions.append(function)
 
