@@ -1,18 +1,19 @@
 class Validator:
+    """
+    بررسی و تبدیل مقادیر ورودی
+    """
 
-    @staticmethod
-    def convert(value, value_type):
+    def validate(self, value, value_type):
 
-        if value_type == "integer":
-
+        if value_type == "int":
             return int(value)
 
         if value_type == "float":
-
             return float(value)
 
-        if value_type == "boolean":
+        if value_type == "bool":
+            if str(value).lower() in ["true", "1", "yes"]:
+                return True
+            return False
 
-            return value.lower() == "true"
-
-        return value
+        return str(value)
