@@ -1,56 +1,17 @@
-import traceback
-
-
 class PythonRunner:
+    """
+    اجرای تابع پایتون
+    """
 
-    def __init__(self):
+    def execute(self, code, function_name, values):
 
-        self.namespace = {}
+        namespace = {}
 
-    def load(self, source_code):
+        exec(code, namespace)
 
-        self.namespace = {}
+        if function_name not in namespace:
+            raise Exception("تابع پیدا نشد.")
 
-        exec(source_code, self.namespace)
+        function = namespace[function_name]
 
-    def execute(self, function_name, arguments):
-
-        try:
-
-            function = self.namespace.get(function_name)
-
-            if function is None:
-
-                return {
-
-                    "success": False,
-
-                    "result": None,
-
-                    "error": "Function not found"
-
-                }
-
-            result = function(**arguments)
-
-            return {
-
-                "success": True,
-
-                "result": result,
-
-                "error": None
-
-            }
-
-        except Exception:
-
-            return {
-
-                "success": False,
-
-                "result": None,
-
-                "error": traceback.format_exc()
-
-            }
+        return function(**values)
