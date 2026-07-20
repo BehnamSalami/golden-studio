@@ -12,7 +12,7 @@ class CodeEditor(MDBoxLayout):
         self.spacing = 10
 
         self.editor = MDTextField(
-            hint_text="کد پایتون خود را اینجا بنویسید...",
+            hint_text="کد پایتون را اینجا بنویسید...",
             multiline=True,
             mode="outlined",
             size_hint_y=1
@@ -21,13 +21,10 @@ class CodeEditor(MDBoxLayout):
         self.add_widget(self.editor)
 
     def get_code(self):
-        """دریافت کد نوشته شده"""
         return self.editor.text
 
     def set_code(self, code):
-        """قرار دادن کد داخل ویرایشگر"""
         self.editor.text = code
 
     def clear(self):
-        """پاک کردن ویرایشگر"""
         self.editor.text = ""
