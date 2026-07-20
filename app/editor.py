@@ -1,38 +1,47 @@
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.button import MDRaisedButton
 
 from app.widgets.code_editor import CodeEditor
 from engine.controller import EngineController
 
 
 class EditorScreen(MDScreen):
+    """
+    صفحه ویرایش کد پایتون
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         self.controller = EngineController()
 
-        layout = MDBoxLayout(
+        self.layout = MDBoxLayout(
             orientation="vertical",
             spacing=10,
             padding=10
         )
 
+        # ویرایشگر کد
         self.editor = CodeEditor()
 
-        button = MDRaisedButton(
-            text="بررسی کد"
+        # دکمه بررسی
+        self.check_button = MDRaisedButton(
+            text="بررسی کد",
+            size_hint=(1, None),
+            height=50
         )
 
-        button.bind(on_release=self.parse_code)
+        self.check_button.bind(
+            on_release=self.check_code
+        )
 
-        layout.add_widget(self.editor)
-        layout.add_widget(button)
+        self.layout.add_widget(self.editor)
+        self.layout.add_widget(self.check_button)
 
-        self.add_widget(layout)
+        self.add_widget(self.layout)
 
-    def parse_code(self, instance):
+    def check_code(self, instance):
 
         code = self.editor.get_code()
 
@@ -40,10 +49,15 @@ class EditorScreen(MDScreen):
 
             form = self.controller.load_code(code)
 
-            self.manager.get_screen("data").load_form(form)
+            data_screen = self.manager.get_screen("data")
+
+            data_screen.load_form(
+                form=form,
+                code=code
+            )
 
             self.manager.current = "data"
 
         except Exception as error:
 
-            print(error)
+            print("Parser Error :", error)
