@@ -1,12 +1,18 @@
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 
 from app.screens.home import HomeScreen
 
 
-class GoldenStudio(App):
+class GoldenStudio(MDApp):
 
     def build(self):
+
+        self.title = "Golden Studio"
+
+        self.theme_cls.primary_palette = "Blue"
+
+        self.theme_cls.theme_style = "Light"
 
         manager = ScreenManager()
 
