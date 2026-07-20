@@ -1,38 +1,50 @@
-from engine.model import Project
-from engine.storage import ProjectStorage
+from engine.storage import Storage
 
 
 class ProjectManager:
+    """
+    مدیریت پروژه‌های Golden Studio
+    """
 
     def __init__(self):
+        self.storage = Storage()
 
-        self.storage = ProjectStorage()
+    def create_project(self, name: str, code: str = ""):
+        """
+        ایجاد پروژه جدید
+        """
+        self.storage.save_project(name, code)
 
-    def create_project(
-        self,
-        name,
-        project_type="Python",
-        description=""
-    ):
+    def get_projects(self):
+        """
+        دریافت لیست پروژه‌ها
+        """
+        return self.storage.get_projects()
 
-        project = Project.create(
-            name=name,
-            project_type=project_type,
-            description=description
+    def open_project(self, project_id: int):
+        """
+        باز کردن پروژه
+        """
+        return self.storage.load_project(project_id)
+
+    def save_project(self, project_id: int, name: str, code: str):
+        """
+        ذخیره تغییرات پروژه
+        """
+        self.storage.update_project(
+            project_id,
+            name,
+            code
         )
 
-        self.storage.save(project)
+    def delete_project(self, project_id: int):
+        """
+        حذف پروژه
+        """
+        self.storage.delete_project(project_id)
 
-        return project
-
-    def open_project(self, project_id):
-
-        return self.storage.load(project_id)
-
-    def list_projects(self):
-
-        return self.storage.get_all_projects()
-
-    def delete_project(self, project_id):
-
-        return self.storage.delete(project_id)
+    def close(self):
+        """
+        بستن اتصال دیتابیس
+        """
+        self.storage.close()
