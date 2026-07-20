@@ -9,46 +9,73 @@ class ProjectStorage:
 
     def __init__(self):
 
-        self.base_path = Path("user_projects")
+        self.projects_folder = Path("user_projects")
 
-        self.base_path.mkdir(exist_ok=True)
+        self.projects_folder.mkdir(exist_ok=True)
 
     def save(self, project: Project):
 
-        project_path = self.base_path / project.id
+        project_folder = self.projects_folder / project.id
 
-        project_path.mkdir(exist_ok=True)
+        project_folder.mkdir(exist_ok=True)
 
-        with open(project_path / "project.json", "w", encoding="utf-8") as file:
+        project_file = project_folder / "project.json"
 
-            json.dump(asdict(project), file, ensure_ascii=False, indent=4)
+        with open(project_file, "w", encoding="utf-8") as file:
+
+            json.dump(
+                asdict(project),
+                file,
+                ensure_ascii=False,
+                indent=4
+            )
 
     def load(self, project_id):
 
-        file_path = self.base_path / project_id / "project.json"
+        project_file = self.projects_folder / project_id / "project.json"
 
-        if not file_path.exists():
+        if not project_file.exists():
 
             return None
 
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(project_file, "r", encoding="utf-8") as file:
 
             data = json.load(file)
 
         return Project(**data)
 
-    def list_projects(self):
+    def get_all_projects(self):
 
         projects = []
 
-        for folder in self.base_path.iterdir():
+        for folder in self.projects_folder.iterdir():
 
-            file_path = folder / "project.json"
+            if folder.is_dir():
 
-            if file_path.exists():
+                project_file = folder / "project.json"
 
-                with open(file_path, "r", encoding="utf-8") as file:
+                if project_file.exists():
 
-                    projects.append(Project(**json.load(file)))
+                    with open(project_file, "r", encoding="utf-8") as file:
+
+                        data = json.load(file)
+
+                    projects.append(Project(**data))
 
         return projects
+
+    def delete(self, project_id):
+
+        project_folder = self.projects_folder / project_id
+
+        if not project_folder.exists():
+
+            return False
+
+        for file in project_folder.iterdir():
+
+            file.unlink()
+
+        project_folder.rmdir()
+
+        return True
