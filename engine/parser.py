@@ -1,63 +1,53 @@
 import ast
 
 
-class FunctionParser:
+class PythonParser:
+    """
+    تحلیل کننده کد پایتون
+    """
 
-    def __init__(self, source_code: str):
+    def parse(self, code: str):
 
-        self.source_code = source_code
+        tree = ast.parse(code)
 
-        self.tree = ast.parse(source_code)
-
-    def get_functions(self):
-
-        functions = []
-
-        for node in self.tree.body:
+        for node in tree.body:
 
             if isinstance(node, ast.FunctionDef):
 
-                function = {
+                return self._parse_function(node)
 
-                    "name": node.name,
+        raise Exception("هیچ تابعی در کد پیدا نشد.")
 
-                    "parameters": [],
+    def _parse_function(self, node):
 
-                    "docstring": ast.get_docstring(node),
+        parameters = []
 
-                    "line": node.lineno
+        for arg in node.args.args:
 
-                }
+            parameter = {
 
-                for arg in node.args.args:
+                "name": arg.arg,
 
-    parameter_type = "text"
+                "type": self._get_type(arg.annotation)
 
-    if arg.annotation:
+            }
 
-        if isinstance(arg.annotation, ast.Name):
+            parameters.append(parameter)
 
-            annotation = arg.annotation.id
+        return {
 
-            if annotation == "int":
-                parameter_type = "integer"
+            "name": node.name,
 
-            elif annotation == "float":
-                parameter_type = "float"
+            "parameters": parameters
 
-            elif annotation == "str":
-                parameter_type = "text"
-
-            elif annotation == "bool":
-                parameter_type = "boolean"
-
-    function["parameters"].append(
-        {
-            "name": arg.arg,
-            "type": parameter_type
         }
-    )
 
-                functions.append(function)
+    def _get_type(self, annotation):
 
-        return functions
+        if annotation is None:
+            return "str"
+
+        if isinstance(annotation, ast.Name):
+            return annotation.id
+
+        return "str"
