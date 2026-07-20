@@ -1,42 +1,24 @@
-from engine.parser import FunctionParser
-
-
 class FormEngine:
+    """
+    تبدیل خروجی Parser به فرم قابل نمایش
+    """
 
-    def __init__(self, source_code):
-
-        self.source_code = source_code
-
-        self.parser = FunctionParser(source_code)
-
-    def build(self):
-
-        functions = self.parser.get_functions()
-
-        if len(functions) == 0:
-
-            return None
-
-        function = functions[0]
+    def build(self, function):
 
         form = {
-
             "title": function["name"],
-
             "fields": []
-
         }
 
         for parameter in function["parameters"]:
 
-            form["fields"].append({
-
+            field = {
                 "label": parameter["name"],
-
                 "type": parameter["type"],
-
+                "required": True,
                 "value": ""
+            }
 
-            })
+            form["fields"].append(field)
 
         return form
