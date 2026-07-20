@@ -1,81 +1,116 @@
-import json
+import sqlite3
 from pathlib import Path
-from dataclasses import asdict
-
-from engine.model import Project
 
 
-class ProjectStorage:
+class Storage:
+    """
+    مسئول ذخیره اطلاعات پروژه
+    """
 
     def __init__(self):
 
-        self.projects_folder = Path("user_projects")
+        self.db_path = Path("golden.db")
 
-        self.projects_folder.mkdir(exist_ok=True)
+        self.connection = sqlite3.connect(self.db_path)
 
-    def save(self, project: Project):
+        self.cursor = self.connection.cursor()
 
-        project_folder = self.projects_folder / project.id
+        self.create_tables()
 
-        project_folder.mkdir(exist_ok=True)
+    def create_tables(self):
 
-        project_file = project_folder / "project.json"
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS projects(
 
-        with open(project_file, "w", encoding="utf-8") as file:
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-            json.dump(
-                asdict(project),
-                file,
-                ensure_ascii=False,
-                indent=4
+            name TEXT NOT NULL,
+
+            code TEXT NOT NULL
+
+        )
+        """)
+
+        self.connection.commit()
+
+    def save_project(self, name: str, code: str):
+
+        self.cursor.execute(
+            """
+            INSERT INTO projects(name,code)
+            VALUES(?,?)
+            """,
+            (name, code)
+        )
+
+        self.connection.commit()
+
+    def get_projects(self):
+
+        self.cursor.execute("""
+        SELECT id,name
+        FROM projects
+        ORDER BY id DESC
+        """)
+
+        return self.cursor.fetchall()
+
+    def load_project(self, project_id):
+
+        self.cursor.execute(
+            """
+            SELECT *
+            FROM projects
+            WHERE id=?
+            """,
+            (project_id,)
+        )
+
+        return self.cursor.fetchone()
+
+    def update_project(
+        self,
+        project_id,
+        name,
+        code
+    ):
+
+        self.cursor.execute(
+            """
+            UPDATE projects
+
+            SET
+
+            name=?,
+
+            code=?
+
+            WHERE id=?
+            """,
+            (
+                name,
+                code,
+                project_id
             )
+        )
 
-    def load(self, project_id):
+        self.connection.commit()
 
-        project_file = self.projects_folder / project_id / "project.json"
+    def delete_project(self, project_id):
 
-        if not project_file.exists():
+        self.cursor.execute(
 
-            return None
+            """
+            DELETE FROM projects
 
-        with open(project_file, "r", encoding="utf-8") as file:
+            WHERE id=?
+            """,
 
-            data = json.load(file)
+            (project_id,)
+        )
 
-        return Project(**data)
+        self.connection.commit()
 
-    def get_all_projects(self):
+    def close(self):
 
-        projects = []
-
-        for folder in self.projects_folder.iterdir():
-
-            if folder.is_dir():
-
-                project_file = folder / "project.json"
-
-                if project_file.exists():
-
-                    with open(project_file, "r", encoding="utf-8") as file:
-
-                        data = json.load(file)
-
-                    projects.append(Project(**data))
-
-        return projects
-
-    def delete(self, project_id):
-
-        project_folder = self.projects_folder / project_id
-
-        if not project_folder.exists():
-
-            return False
-
-        for file in project_folder.iterdir():
-
-            file.unlink()
-
-        project_folder.rmdir()
-
-        return True
+        self.connection.close()
