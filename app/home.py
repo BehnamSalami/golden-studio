@@ -1,73 +1,78 @@
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.scrollview import MDScrollView
+from kivymd.uix.label import MDLabel
 
-from app.project_dialog import ProjectDialog
+from engine.project import ProjectManager
 from app.widgets.project_card import ProjectCard
 
 
 class HomeScreen(MDScreen):
+    """
+    صفحه اصلی Golden Studio
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.projects = []
+        self.manager_engine = ProjectManager()
 
-        root = MDBoxLayout(
+        self.layout = MDBoxLayout(
             orientation="vertical",
-            padding=15,
-            spacing=15
+            spacing=10,
+            padding=10
         )
 
-        title = MDLabel(
+        self.title = MDLabel(
             text="Golden Studio",
             halign="center",
-            font_style="Headline"
+            font_style="H4"
         )
 
-        root.add_widget(title)
-
-        new_button = MDRaisedButton(
-            text="➕ پروژه جدید",
-            pos_hint={"center_x": 0.5}
+        self.new_button = MDRaisedButton(
+            text="پروژه جدید"
         )
 
-        new_button.bind(
-            on_release=self.open_dialog
+        self.new_button.bind(
+            on_release=self.new_project
         )
-
-        root.add_widget(new_button)
-
-        self.scroll = MDScrollView()
 
         self.project_list = MDBoxLayout(
             orientation="vertical",
-            adaptive_height=True,
-            spacing=10
+            spacing=8,
+            size_hint_y=None
         )
 
-        self.scroll.add_widget(self.project_list)
+        self.layout.add_widget(self.title)
+        self.layout.add_widget(self.new_button)
+        self.layout.add_widget(self.project_list)
 
-        root.add_widget(self.scroll)
+        self.add_widget(self.layout)
 
-        self.add_widget(root)
+        self.refresh_projects()
 
-    def open_dialog(self, *args):
+    def refresh_projects(self):
 
-        dialog = ProjectDialog(
-            self.create_project
-        )
+        self.project_list.clear_widgets()
 
-        dialog.open()
+        projects = self.manager_engine.get_projects()
 
-    def create_project(self, project_name):
+        for project in projects:
 
-        self.projects.append(project_name)
+            project_id = project[0]
+            project_name = project[1]
 
-        card = ProjectCard(project_name)
+            card = ProjectCard(
+                project_id,
+                project_name
+            )
 
-        self.project_list.add_widget(card)
+            self.project_list.add_widget(card)
 
-        print("Project Created:", project_name)
+    def new_project(self, instance):
+
+        self.manager.current = "editor"
+
+    def on_pre_enter(self):
+
+        self.refresh_projects()
