@@ -1,10 +1,8 @@
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.boxlayout import MDBoxLayout
 
 from app.widgets.code_editor import CodeEditor
-
 from engine.controller import EngineController
 
 
@@ -13,58 +11,39 @@ class EditorScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.engine = EngineController()
+        self.controller = EngineController()
 
         layout = MDBoxLayout(
             orientation="vertical",
-            padding=15,
-            spacing=15
-        )
-
-        title = MDLabel(
-            text="ویرایشگر پایتون",
-            halign="center",
-            font_style="Headline"
+            spacing=10,
+            padding=10
         )
 
         self.editor = CodeEditor()
 
-        self.analyze_button = MDRaisedButton(
-            text="بررسی کد",
-            pos_hint={"center_x": 0.5}
+        button = MDRaisedButton(
+            text="بررسی کد"
         )
 
-        self.analyze_button.bind(
-            on_release=self.analyze_code
-        )
+        button.bind(on_release=self.parse_code)
 
-        layout.add_widget(title)
         layout.add_widget(self.editor)
-        layout.add_widget(self.analyze_button)
+        layout.add_widget(button)
 
         self.add_widget(layout)
 
-    def analyze_code(self, *args):
+    def parse_code(self, instance):
 
         code = self.editor.get_code()
 
-        if not code.strip():
-            print("کدی وارد نشده است.")
-            return
-
         try:
 
-            form = self.engine.load_code(code)
+            form = self.controller.load_code(code)
 
-            print("====== فرم ساخته شد ======")
-            print(form)
+            self.manager.get_screen("data").load_form(form)
 
-            if self.manager:
-                data_screen = self.manager.get_screen("data")
-                data_screen.build_form(form)
-                self.manager.current = "data"
+            self.manager.current = "data"
 
         except Exception as error:
 
-            print("خطا در تحلیل کد")
             print(error)
