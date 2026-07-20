@@ -9,52 +9,42 @@ class ResultScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        root = MDBoxLayout(
+        self.layout = MDBoxLayout(
             orientation="vertical",
             padding=20,
-            spacing=20
+            spacing=15
         )
 
-        title = MDLabel(
+        self.title = MDLabel(
             text="نتیجه محاسبه",
             halign="center",
-            font_style="Headline"
+            font_style="H5"
         )
-
-        root.add_widget(title)
 
         self.result_label = MDLabel(
-            text="هنوز نتیجه‌ای وجود ندارد.",
-            halign="center"
+            text="",
+            halign="center",
+            font_style="H4"
         )
 
-        root.add_widget(self.result_label)
-
         self.back_button = MDRaisedButton(
-            text="بازگشت به صفحه اصلی",
-            pos_hint={"center_x": 0.5}
+            text="بازگشت"
         )
 
         self.back_button.bind(
             on_release=self.go_home
         )
 
-        root.add_widget(self.back_button)
+        self.layout.add_widget(self.title)
+        self.layout.add_widget(self.result_label)
+        self.layout.add_widget(self.back_button)
 
-        self.add_widget(root)
+        self.add_widget(self.layout)
 
     def show_result(self, result):
 
-        text = ""
+        self.result_label.text = str(result)
 
-        for key, value in result.items():
+    def go_home(self, instance):
 
-            text += f"{key} : {value}\n"
-
-        self.result_label.text = text
-
-    def go_home(self, *args):
-
-        if self.manager:
-
-            self.manager.current = "home"
+        self.manager.current = "home"
