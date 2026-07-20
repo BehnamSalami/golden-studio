@@ -1,32 +1,45 @@
-from kivy.uix.screenmanager import Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.label import Label
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.label import MDLabel
+from kivymd.uix.boxlayout import MDBoxLayout
 
 
-class HomeScreen(Screen):
+class HomeScreen(MDScreen):
 
     def __init__(self, **kwargs):
+
         super().__init__(**kwargs)
 
-        layout = BoxLayout(
+        layout = MDBoxLayout(
+
             orientation="vertical",
-            spacing=10,
-            padding=15
+
+            padding=20,
+
+            spacing=20
+
         )
 
-        title = Label(
+        title = MDLabel(
+
             text="Golden Studio",
-            font_size=28,
-            size_hint=(1, 0.15)
+
+            halign="center",
+
+            font_style="Headline"
+
         )
 
-        new_project = Button(
-            text="➕ پروژه جدید",
-            size_hint=(1, 0.12)
+        button = MDRaisedButton(
+
+            text="پروژه جدید",
+
+            pos_hint={"center_x": 0.5}
+
         )
 
         layout.add_widget(title)
-        layout.add_widget(new_project)
+
+        layout.add_widget(button)
 
         self.add_widget(layout)
