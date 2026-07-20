@@ -2,13 +2,18 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDRaisedButton
-from kivymd.uix.card import MDCard
+from kivymd.uix.scrollview import MDScrollView
+
+from app.project_dialog import ProjectDialog
+from app.widgets.project_card import ProjectCard
 
 
 class HomeScreen(MDScreen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        self.projects = []
 
         root = MDBoxLayout(
             orientation="vertical",
@@ -24,43 +29,45 @@ class HomeScreen(MDScreen):
 
         root.add_widget(title)
 
-        new_project = MDRaisedButton(
+        new_button = MDRaisedButton(
             text="➕ پروژه جدید",
-            pos_hint={"center_x": .5}
+            pos_hint={"center_x": 0.5}
         )
 
-        root.add_widget(new_project)
-
-        subtitle = MDLabel(
-            text="پروژه‌های من",
-            font_style="Title",
-            padding=[0,20,0,10]
+        new_button.bind(
+            on_release=self.open_dialog
         )
 
-        root.add_widget(subtitle)
+        root.add_widget(new_button)
 
-        projects = [
-            "تحلیل شرکت تولیدی",
-            "تحلیل شرکت سرمایه گذاری",
-            "ساخت سایت فروشگاهی"
-        ]
+        self.scroll = MDScrollView()
 
-        for project in projects:
+        self.project_list = MDBoxLayout(
+            orientation="vertical",
+            adaptive_height=True,
+            spacing=10
+        )
 
-            card = MDCard(
-                orientation="vertical",
-                padding=15,
-                radius=[15],
-                size_hint_y=None,
-                height=70
-            )
+        self.scroll.add_widget(self.project_list)
 
-            label = MDLabel(
-                text="📁  " + project
-            )
-
-            card.add_widget(label)
-
-            root.add_widget(card)
+        root.add_widget(self.scroll)
 
         self.add_widget(root)
+
+    def open_dialog(self, *args):
+
+        dialog = ProjectDialog(
+            self.create_project
+        )
+
+        dialog.open()
+
+    def create_project(self, project_name):
+
+        self.projects.append(project_name)
+
+        card = ProjectCard(project_name)
+
+        self.project_list.add_widget(card)
+
+        print("Project Created:", project_name)
