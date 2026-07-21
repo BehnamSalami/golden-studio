@@ -1,22 +1,24 @@
 class Session:
     """
-    نگهداری اطلاعات پروژه جاری
+    نگهداری وضعیت فعلی موتور
     """
 
     def __init__(self):
 
-        self.project = None
+        self.current_project = None
+
         self.code = ""
+
         self.function = None
-        self.form = None
-        self.inputs = {}
+
         self.result = None
 
-    def clear(self):
+    def reset(self):
 
-        self.project = None
+        self.current_project = None
+
         self.code = ""
+
         self.function = None
-        self.form = None
-        self.inputs = {}
+
         self.result = None
