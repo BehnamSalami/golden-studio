@@ -4,6 +4,8 @@ from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.label import MDLabel
 
 from engine.project import ProjectManager
+
+from app.project_dialog import ProjectDialog
 from app.widgets.project_card import ProjectCard
 
 
@@ -16,6 +18,10 @@ class HomeScreen(MDScreen):
         super().__init__(**kwargs)
 
         self.manager_engine = ProjectManager()
+
+        self.project_dialog = ProjectDialog(
+            self.create_project
+        )
 
         self.layout = MDBoxLayout(
             orientation="vertical",
@@ -52,6 +58,7 @@ class HomeScreen(MDScreen):
         self.refresh_projects()
 
     def refresh_projects(self):
+
         self.project_list.clear_widgets()
 
         projects = self.manager_engine.get_projects()
@@ -70,23 +77,35 @@ class HomeScreen(MDScreen):
             self.project_list.add_widget(card)
 
     def new_project(self, instance):
-        self.manager.current = "editor"
+
+        self.project_dialog.open()
+
+    def create_project(self, project_name):
+
+        self.manager_engine.create_project(
+            name=project_name,
+            code=""
+        )
+
+        self.refresh_projects()
 
     def open_project(self, project_id):
-        """
-        باز کردن پروژه
-        """
 
-        project = self.manager_engine.open_project(project_id)
+        project = self.manager_engine.open_project(
+            project_id
+        )
 
         if project is None:
             return
 
         _, name, code = project
 
-        editor = self.manager.get_screen("editor")
+        editor = self.manager.get_screen(
+            "editor"
+        )
 
         if hasattr(editor, "load_project"):
+
             editor.load_project(
                 project_id,
                 name,
@@ -96,4 +115,5 @@ class HomeScreen(MDScreen):
         self.manager.current = "editor"
 
     def on_pre_enter(self):
+
         self.refresh_projects()
