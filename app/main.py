@@ -28,4 +28,5 @@ class GoldenStudio(MDApp):
         return manager
 
 
-GoldenStudio().run()
+if __name__ == "__main__":
+    GoldenStudio().run()
