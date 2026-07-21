@@ -52,7 +52,6 @@ class HomeScreen(MDScreen):
         self.refresh_projects()
 
     def refresh_projects(self):
-
         self.project_list.clear_widgets()
 
         projects = self.manager_engine.get_projects()
@@ -63,16 +62,38 @@ class HomeScreen(MDScreen):
             project_name = project[1]
 
             card = ProjectCard(
-                project_id,
-                project_name
+                project_id=project_id,
+                project_name=project_name,
+                callback=self.open_project
             )
 
             self.project_list.add_widget(card)
 
     def new_project(self, instance):
+        self.manager.current = "editor"
+
+    def open_project(self, project_id):
+        """
+        باز کردن پروژه
+        """
+
+        project = self.manager_engine.open_project(project_id)
+
+        if project is None:
+            return
+
+        _, name, code = project
+
+        editor = self.manager.get_screen("editor")
+
+        if hasattr(editor, "load_project"):
+            editor.load_project(
+                project_id,
+                name,
+                code
+            )
 
         self.manager.current = "editor"
 
     def on_pre_enter(self):
-
         self.refresh_projects()
