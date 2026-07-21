@@ -9,8 +9,8 @@ class ProjectCard(MDCard):
 
     def __init__(
         self,
-        project_id,
-        project_name,
+        project_id: int,
+        project_name: str,
         callback=None,
         **kwargs
     ):
@@ -21,37 +21,32 @@ class ProjectCard(MDCard):
         self.callback = callback
 
         self.orientation = "vertical"
-
-        self.padding = 15
-
-        self.spacing = 10
-
-        self.radius = [12]
+        self.padding = "12dp"
+        self.spacing = "8dp"
 
         self.size_hint_y = None
+        self.height = "70dp"
 
-        self.height = 70
-
+        self.radius = [12, 12, 12, 12]
+        self.elevation = 2
         self.ripple_behavior = True
-
-        self.focus_behavior = True
 
         self.label = MDLabel(
             text=project_name,
-            halign="center"
+            halign="center",
+            valign="middle"
         )
 
         self.add_widget(self.label)
 
         self.bind(
-            on_release=self.open_project
+            on_release=self._on_card_pressed
         )
 
-    def open_project(self, *args):
+    def _on_card_pressed(self, *args):
         """
-        باز کردن پروژه
+        هنگام لمس کارت
         """
 
-        if self.callback:
-
+        if callable(self.callback):
             self.callback(self.project_id)
