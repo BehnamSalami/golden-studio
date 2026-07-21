@@ -1,130 +1,95 @@
-from kivymd.uix.screen import MDScreen
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.button import MDRaisedButton
-
-from app.widgets.code_editor import CodeEditor
-
-from engine.controller import EngineController
-from engine.project import ProjectManager
+from engine.storage import Storage
 
 
-class EditorScreen(MDScreen):
+class ProjectManager:
     """
-    صفحه ویرایش کد
+    مدیریت پروژه‌های Golden Studio
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
 
-        self.controller = EngineController()
+        self.storage = Storage()
 
-        self.project_manager = ProjectManager()
-
-        self.project_id = None
-
-        self.project_name = ""
-
-        self.layout = MDBoxLayout(
-            orientation="vertical",
-            spacing=10,
-            padding=10
-        )
-
-        self.editor = CodeEditor()
-
-        self.check_button = MDRaisedButton(
-            text="بررسی کد",
-            size_hint=(1, None),
-            height=50
-        )
-
-        self.save_button = MDRaisedButton(
-            text="ذخیره پروژه",
-            size_hint=(1, None),
-            height=50
-        )
-
-        self.check_button.bind(
-            on_release=self.check_code
-        )
-
-        self.save_button.bind(
-            on_release=self.save_project
-        )
-
-        self.layout.add_widget(self.editor)
-        self.layout.add_widget(self.check_button)
-        self.layout.add_widget(self.save_button)
-
-        self.add_widget(self.layout)
-
-    def load_project(
+    def create_project(
         self,
-        project_id,
-        project_name,
-        code
+        name: str,
+        code: str = ""
     ):
         """
-        بارگذاری پروژه
+        ایجاد پروژه جدید
         """
 
-        self.project_id = project_id
-
-        self.project_name = project_name
-
-        self.editor.set_code(code)
-
-    def save_project(self, *args):
-        """
-        ذخیره پروژه
-        """
-
-        if self.project_id is None:
-            return
-
-        code = self.editor.get_code()
-
-        self.project_manager.update_project(
-            self.project_id,
-            self.project_name,
+        return self.storage.save_project(
+            name,
             code
         )
 
-        print("Project Saved")
-
-    def check_code(self, instance):
-
-        code = self.editor.get_code()
-
-        try:
-
-            form = self.controller.load_code(code)
-
-            data_screen = self.manager.get_screen(
-                "data"
-            )
-
-            data_screen.load_form(
-                form=form,
-                code=code
-            )
-
-            self.manager.current = "data"
-
-        except Exception as error:
-
-            print(
-                "Parser Error:",
-                error
-            )
-
-    def clear(self):
+    def get_projects(self):
         """
-        پروژه جدید
+        دریافت لیست پروژه‌ها
         """
 
-        self.project_id = None
+        return self.storage.get_projects()
 
-        self.project_name = ""
+    def open_project(
+        self,
+        project_id: int
+    ):
+        """
+        باز کردن پروژه
+        """
 
-        self.editor.clear()
+        return self.storage.load_project(
+            project_id
+        )
+
+    def update_project(
+        self,
+        project_id: int,
+        name: str,
+        code: str
+    ):
+        """
+        بروزرسانی پروژه
+        """
+
+        return self.storage.update_project(
+            project_id,
+            name,
+            code
+        )
+
+    def save_project(
+        self,
+        project_id: int,
+        name: str,
+        code: str
+    ):
+        """
+        سازگاری با نسخه‌های قبلی
+        """
+
+        return self.update_project(
+            project_id,
+            name,
+            code
+        )
+
+    def delete_project(
+        self,
+        project_id: int
+    ):
+        """
+        حذف پروژه
+        """
+
+        return self.storage.delete_project(
+            project_id
+        )
+
+    def close(self):
+        """
+        بستن اتصال دیتابیس
+        """
+
+        self.storage.close()
