@@ -1,4 +1,4 @@
-```python
+
 import sqlite3
 from pathlib import Path
 
@@ -183,4 +183,4 @@ class Storage:
     def close(self):
 
         self.connection.close()
-```
+
