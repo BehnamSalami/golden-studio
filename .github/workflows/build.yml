@@ -67,7 +67,7 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         run: |
-          buildozer android clean
+          
           buildozer -v android debug
 
       - name: Upload APK
