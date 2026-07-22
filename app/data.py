@@ -1,22 +1,23 @@
+```python
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.button import MDRaisedButton
 
-from engine.validator import Validator
-from engine.runner import PythonRunner
+from engine.controller import EngineController
 
 
 class DataScreen(MDScreen):
+    """
+    صفحه ورود اطلاعات تابع
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.validator = Validator()
-        self.runner = PythonRunner()
+        self.controller = EngineController()
 
-        self.function = None
-        self.code = ""
+        self.form = None
 
         self.layout = MDBoxLayout(
             orientation="vertical",
@@ -26,11 +27,13 @@ class DataScreen(MDScreen):
 
         self.fields = {}
 
-        self.button = MDRaisedButton(
+        self.run_button = MDRaisedButton(
             text="اجرای تابع"
         )
 
-        self.button.bind(on_release=self.run_function)
+        self.run_button.bind(
+            on_release=self.run_function
+        )
 
         self.add_widget(self.layout)
 
@@ -40,46 +43,51 @@ class DataScreen(MDScreen):
 
         self.fields = {}
 
-        self.function = form
-
-        self.code = code
+        self.form = form
 
         for field in form["fields"]:
 
-            text = MDTextField(
+            widget = MDTextField(
                 hint_text=field["label"]
             )
 
-            self.fields[field["label"]] = (
-                text,
-                field["type"]
-            )
+            self.fields[field["label"]] = widget
 
-            self.layout.add_widget(text)
+            self.layout.add_widget(widget)
 
-        self.layout.add_widget(self.button)
+        self.layout.add_widget(self.run_button)
 
     def run_function(self, instance):
 
         values = {}
 
-        for name, item in self.fields.items():
+        for name, widget in self.fields.items():
 
-            widget, value_type = item
+            values[name] = widget.text
 
-            values[name] = self.validator.validate(
-                widget.text,
-                value_type
+        try:
+
+            result = self.controller.run(values)
+
+            result_screen = self.manager.get_screen(
+                "result"
             )
 
-        result = self.runner.execute(
-            self.code,
-            self.function["title"],
-            values
-        )
+            result_screen.show_result(
+                result.result
+            )
 
-        result_screen = self.manager.get_screen("result")
+            self.manager.current = "result"
 
-        result_screen.show_result(result)
+        except Exception as error:
 
-        self.manager.current = "result"
+            result_screen = self.manager.get_screen(
+                "result"
+            )
+
+            result_screen.show_error(
+                str(error)
+            )
+
+            self.manager.current = "result"
+```
