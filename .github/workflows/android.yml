@@ -2,12 +2,12 @@
 name: Build Golden Studio APK
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - main
       - master
-
-  workflow_dispatch:
 
 jobs:
   build:
@@ -16,31 +16,55 @@ jobs:
 
     steps:
 
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install system packages
+      - name: Install Linux Packages
         run: |
-          sudo apt update
-          sudo apt install -y \
-            zip unzip openjdk-17-jdk \
-            git python3-pip \
-            autoconf automake libtool \
-            pkg-config zlib1g-dev \
-            libncurses5-dev libffi-dev \
-            libssl-dev
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            python3-pip \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libffi-dev \
+            libssl-dev \
+            cmake
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
 
       - name: Install Buildozer
         run: |
-          python -m pip install --upgrade pip
-          pip install buildozer cython
+          pip install cython==0.29.36
+          pip install buildozer
 
-      - name: Build APK
+      - name: Initialize Buildozer
+        run: |
+          buildozer init || true
+
+      - name: Accept Android SDK Licenses
+        run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+
+          yes | buildozer android update || true
+
+      - name: Build Debug APK
         run: |
           buildozer android debug
 
@@ -48,4 +72,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: GoldenStudio-APK
-          path: bin/*.apk
+          path: |
+            bin/*.apk
