@@ -1,4 +1,4 @@
-```python
+
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
@@ -80,4 +80,4 @@ class ResultScreen(MDScreen):
         self.clear()
 
         self.manager.current = "home"
-```
+
