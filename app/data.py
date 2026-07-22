@@ -8,24 +8,23 @@ from engine.controller import EngineController
 
 
 class DataScreen(MDScreen):
-    """
-    صفحه ورود اطلاعات تابع
-    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         self.controller = EngineController()
 
+        self.code = ""
+
         self.form = None
+
+        self.fields = {}
 
         self.layout = MDBoxLayout(
             orientation="vertical",
             padding=15,
             spacing=10
         )
-
-        self.fields = {}
 
         self.run_button = MDRaisedButton(
             text="اجرای تابع"
@@ -37,21 +36,23 @@ class DataScreen(MDScreen):
 
         self.add_widget(self.layout)
 
-    def load_form(self, form, code=""):
+    def load_form(self, form, code):
 
-        self.layout.clear_widgets()
-
-        self.fields = {}
+        self.code = code
 
         self.form = form
 
-        for field in form["fields"]:
+        self.fields = {}
+
+        self.layout.clear_widgets()
+
+        for item in form["fields"]:
 
             widget = MDTextField(
-                hint_text=field["label"]
+                hint_text=item["label"]
             )
 
-            self.fields[field["label"]] = widget
+            self.fields[item["label"]] = widget
 
             self.layout.add_widget(widget)
 
@@ -67,13 +68,19 @@ class DataScreen(MDScreen):
 
         try:
 
-            result = self.controller.run(values)
+            self.controller.load_code(
+                self.code
+            )
 
-            result_screen = self.manager.get_screen(
+            result = self.controller.run(
+                values
+            )
+
+            screen = self.manager.get_screen(
                 "result"
             )
 
-            result_screen.show_result(
+            screen.show_result(
                 result.result
             )
 
@@ -81,11 +88,11 @@ class DataScreen(MDScreen):
 
         except Exception as error:
 
-            result_screen = self.manager.get_screen(
+            screen = self.manager.get_screen(
                 "result"
             )
 
-            result_screen.show_error(
+            screen.show_error(
                 str(error)
             )
 
