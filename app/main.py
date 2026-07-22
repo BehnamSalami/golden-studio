@@ -1,3 +1,4 @@
+```python
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 
@@ -17,16 +18,31 @@ class GoldenStudio(MDApp):
 
         manager = ScreenManager()
 
-        manager.add_widget(HomeScreen(name="home"))
+        manager.add_widget(
+            HomeScreen(
+                name="home"
+            )
+        )
 
-        manager.add_widget(EditorScreen(name="editor"))
+        manager.add_widget(
+            EditorScreen(
+                name="editor"
+            )
+        )
 
-        manager.add_widget(DataScreen(name="data"))
+        manager.add_widget(
+            DataScreen(
+                name="data"
+            )
+        )
 
-        manager.add_widget(ResultScreen(name="result"))
+        manager.add_widget(
+            ResultScreen(
+                name="result"
+            )
+        )
+
+        manager.current = "home"
 
         return manager
-
-
-if __name__ == "__main__":
-    GoldenStudio().run()
+```
