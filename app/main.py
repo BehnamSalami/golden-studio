@@ -45,4 +45,3 @@ class GoldenStudio(MDApp):
         manager.current = "home"
 
         return manager
-
