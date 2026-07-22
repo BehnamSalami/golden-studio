@@ -1,3 +1,17 @@
+```python
+"""
+Golden Studio
+
+نقطه شروع برنامه
+"""
+
 from app.main import GoldenStudio
 
-GoldenStudio().run()
+
+def main():
+    GoldenStudio().run()
+
+
+if __name__ == "__main__":
+    main()
+```
