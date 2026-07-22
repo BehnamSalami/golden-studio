@@ -13,7 +13,7 @@ source.include_exts = py,png,jpg,kv,json,db,txt
 
 version = 1.0
 
-requirements = python3,kivy==2.3.0,kivymd==1.2.0,reportlab,pillow,sqlite3
+requirements = python3,kivy,kivymd,sqlite3
 
 orientation = portrait
 
@@ -29,7 +29,7 @@ android.minapi = 24
 
 android.archs = arm64-v8a
 
-android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
+android.permissions = INTERNET
 
 icon.filename = assets/icon.png
 
