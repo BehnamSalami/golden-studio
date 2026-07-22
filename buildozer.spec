@@ -1,40 +1,35 @@
 [app]
 
-# (str) Title of your application
 title = Golden Studio
 
-# (str) Package name
 package.name = goldenstudio
-
-# (str) Package domain
 package.domain = com.goldenstudio
 
-# (str) Source code directory
 source.dir = .
+source.include_exts = py,png,jpg,kv,json,db,txt
 
-# (list) Included file extensions
-source.include_exts = py,png,jpg,jpeg,kv,json,txt,db
+version = 1.0
 
-# (list) Excluded directories
-source.exclude_dirs = .git,.github,bin,build,__pycache__
+requirements = python3==3.11,kivy==2.3.0,kivymd==1.2.0
 
-# (str) Application version
-version = 1.0.0
-
-# (list) Application requirements
-requirements = python3,kivy==2.3.0,kivymd==1.2.0
-
-# (str) Orientation
 orientation = portrait
-
-# (bool) Fullscreen
 fullscreen = 0
 
-# (str) Icon
-icon.filename = assets/icon.png
+android.api = 33
+android.minapi = 24
+android.sdk = 33
+android.ndk = 25b
+android.archs = arm64-v8a
 
-# (str) Splash screen
+android.permissions = INTERNET
+
+icon.filename = assets/icon.png
 presplash.filename = assets/splash.png
+
+log_level = 2
+warn_on_root = 1
+
+p4a.branch = 2024.01.21
 
 # -------------------------
 # Android Configuration
