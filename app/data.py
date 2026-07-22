@@ -1,4 +1,4 @@
-```python
+
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.textfield import MDTextField
@@ -97,4 +97,4 @@ class DataScreen(MDScreen):
             )
 
             self.manager.current = "result"
-```
+
