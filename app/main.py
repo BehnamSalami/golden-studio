@@ -1,4 +1,4 @@
-```python
+
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 
@@ -45,4 +45,4 @@ class GoldenStudio(MDApp):
         manager.current = "home"
 
         return manager
-```
+
