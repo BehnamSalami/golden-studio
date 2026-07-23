@@ -1,7 +1,6 @@
 [app]
 
 title = Golden Studio
-
 package.name = goldenstudio
 package.domain = com.goldenstudio
 
