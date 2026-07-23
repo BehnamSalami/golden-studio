@@ -30,8 +30,6 @@ presplash.filename = assets/splash.png
 log_level = 2
 warn_on_root = 1
 
-p4a.branch = 2024.01.21
-
 
 [buildozer]
 
