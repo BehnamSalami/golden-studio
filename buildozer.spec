@@ -15,7 +15,6 @@ requirements = python3==3.11,kivy==2.3.0,kivymd==1.2.0
 orientation = portrait
 fullscreen = 0
 
-android.api = 33
 android.minapi = 24
 android.sdk = 33
 android.ndk = 25b
