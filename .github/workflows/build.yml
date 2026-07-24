@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -25,27 +29,34 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install Android packages
+      - name: Install SDK packages
         run: |
+          yes | sdkmanager --licenses
+
           sdkmanager \
             "platform-tools" \
             "platforms;android-34" \
             "build-tools;34.0.0" \
+            "cmdline-tools;latest" \
             "ndk;28.0.13004108"
 
-      - name: Install Linux dependencies
+      - name: Export Android variables
+        run: |
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROIDSDK=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/28.0.13004108" >> $GITHUB_ENV
+
+      - name: Install Linux packages
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
-            autoconf automake libtool pkg-config \
-            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            git zip unzip \
+            autoconf automake libtool \
+            pkg-config zlib1g-dev \
+            libncurses5-dev libncursesw5-dev \
             cmake libffi-dev libssl-dev \
             ccache libltdl-dev
 
@@ -55,14 +66,16 @@ jobs:
 
       - name: Install Buildozer
         run: |
-          pip install buildozer cython
-          pip install "python-for-android>=2024.1.21"
+          pip install buildozer==1.5.0
+          pip install Cython==0.29.33
+          pip install python-for-android==2024.01.21
 
       - name: Build APK
         run: |
           buildozer android debug
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: GoldenStudio-APK
