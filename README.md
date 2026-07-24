@@ -11,3 +11,4 @@ Features
 - SQLite Database
 - PDF Reports
 - Result History
+- salami
