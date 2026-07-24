@@ -1,95 +1,52 @@
-from engine.storage import Storage
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.label import MDLabel
+
+from app.widgets.code_editor import CodeEditor
+from engine.controller import EngineController
 
 
-class ProjectManager:
-    """
-    مدیریت پروژه‌های Golden Studio
-    """
+class EditorScreen(MDScreen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-    def __init__(self):
+        self.controller = EngineController()
+        self.project_id = None
+        self.project_name = ""
 
-        self.storage = Storage()
+        self.layout = MDBoxLayout(orientation="vertical", padding=10, spacing=10)
 
-    def create_project(
-        self,
-        name: str,
-        code: str = ""
-    ):
-        """
-        ایجاد پروژه جدید
-        """
+        self.title = MDLabel(text="ویرایشگر کد", font_style="H5", halign="center")
+        self.code_editor = CodeEditor()
 
-        return self.storage.save_project(
-            name,
-            code
-        )
+        self.run_button = MDRaisedButton(text="اجرای کد و نمایش فرم")
+        self.run_button.bind(on_release=self.run_code)
 
-    def get_projects(self):
-        """
-        دریافت لیست پروژه‌ها
-        """
+        self.layout.add_widget(self.title)
+        self.layout.add_widget(self.code_editor)
+        self.layout.add_widget(self.run_button)
 
-        return self.storage.get_projects()
+        self.add_widget(self.layout)
 
-    def open_project(
-        self,
-        project_id: int
-    ):
-        """
-        باز کردن پروژه
-        """
+    def load_project(self, project_id, name, code):
+        self.project_id = project_id
+        self.project_name = name
+        self.title.text = f"ویرایش: {name}"
+        self.code_editor.set_code(code)
 
-        return self.storage.load_project(
-            project_id
-        )
+    def run_code(self, instance):
+        code = self.code_editor.get_code()
+        if not code.strip():
+            return
 
-    def update_project(
-        self,
-        project_id: int,
-        name: str,
-        code: str
-    ):
-        """
-        بروزرسانی پروژه
-        """
-
-        return self.storage.update_project(
-            project_id,
-            name,
-            code
-        )
-
-    def save_project(
-        self,
-        project_id: int,
-        name: str,
-        code: str
-    ):
-        """
-        سازگاری با نسخه‌های قبلی
-        """
-
-        return self.update_project(
-            project_id,
-            name,
-            code
-        )
-
-    def delete_project(
-        self,
-        project_id: int
-    ):
-        """
-        حذف پروژه
-        """
-
-        return self.storage.delete_project(
-            project_id
-        )
-
-    def close(self):
-        """
-        بستن اتصال دیتابیس
-        """
-
-        self.storage.close()
+        try:
+            form = self.controller.load_code(code)
+            data_screen = self.manager.get_screen("data")
+            data_screen.load_form(form, code)
+            self.manager.current = "data"
+        except Exception as e:
+            # نمایش خطا
+            result_screen = self.manager.get_screen("result")
+            result_screen.show_error(str(e))
+            self.manager.current = "result"
