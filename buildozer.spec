@@ -15,10 +15,13 @@ fullscreen = 0
 
 android.api = 34
 android.minapi = 24
-android.ndk = 28
+android.ndk = 28c
 android.archs = arm64-v8a
 
 android.permissions = INTERNET
+
+android.accept_sdk_license = True
+android.skip_update = True
 
 icon.filename = assets/icon.png
 presplash.filename = assets/splash.png
